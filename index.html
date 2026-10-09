@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>积分计算 · 核心题库卡片复习</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css?v=20261007">
+<link rel="stylesheet" href="styles.css?v=20261007">
+</head>
+<body>
+<div class="app">
+  <!-- 侧边导航 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">∫</div>
+      <div>
+        <div class="brand-title">积分计算 · 核心题库</div>
+        <div class="brand-sub">卡片式复习 · 185 题</div>
+      </div>
+    </div>
+
+    <button class="home-btn" id="homeBtn">★ 复习导览 · 总思路</button>
+
+    <div class="side-section">题库分类</div>
+    <nav class="cat-tree" id="catTree"></nav>
+
+    <div class="side-foot">
+      <div>题目来源：《大观严选题答案》</div>
+      <div>知识点：《一元微分知识点》</div>
+      <div>学习进度自动保存在本机浏览器</div>
+    </div>
+  </aside>
+
+  <!-- 主区域 -->
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-toggle" id="menuToggle" title="目录">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <div class="top-actions">
+        <input type="search" id="searchInput" class="search" placeholder="搜索题号/来源，如 2021、660、区间再现">
+        <button class="pill-btn" id="shuffleBtn" title="随机顺序刷题">🔀 乱序</button>
+      </div>
+    </header>
+
+    <!-- 概览面板 -->
+    <section class="view view-home" id="homeView">
+      <div class="chapter-switch">
+        <button class="ch-btn active" data-ch="jifen">📐 一元积分</button>
+        <button class="ch-btn" data-ch="weifen">📈 一元微分</button>
+      </div>
+      <div class="hero">
+        <h1 id="heroTitle">积分计算核心题库 <span class="hero-badge">卡片复习</span></h1>
+        <p id="heroSub">7 大题型 · 46 个做题模板 · 每题含题干、详解与手写批注。先想后看，按模板总结套路。</p>
+        <div class="hero-stats" id="heroStats"></div>
+        <div class="hero-actions">
+          <button class="primary-btn" id="startAllBtn">开始刷全部</button>
+          <button class="ghost-btn" id="continueBtn">继续复习</button>
+          <button class="ghost-btn" id="reviewWeakBtn">只刷模糊题</button>
+        </div>
+      </div>
+      <div class="method-card" id="methodCard"></div>
+      <h2 class="block-title">按题型进入</h2>
+      <div class="cat-grid" id="catGrid"></div>
+    </section>
+
+    <!-- 题目网格浏览 -->
+    <section class="view view-grid hidden" id="gridView">
+      <div class="grid-toolbar">
+        <div class="filter-chip-row" id="filterChips"></div>
+      </div>
+      <div class="card-grid" id="cardGrid"></div>
+    </section>
+
+    <!-- 单题卡片复习 -->
+    <section class="view view-study hidden" id="studyView">
+      <div class="study-progress">
+        <div class="progress-text"><span id="posText">1 / 1</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+
+      <article class="qcard">
+        <div class="qcard-head">
+          <div class="qcard-tags" id="qTags"></div>
+          <div class="state-badge" id="stateBadge"></div>
+        </div>
+        <h2 class="qcard-title" id="qTitle"></h2>
+
+        <div class="knowledge-block" id="knowledgeBlock">
+          <button class="kb-toggle" id="kbToggle">
+            <span class="kb-caret">▼</span>
+            <span class="kb-title">📖 知识点温习 · 先看这里再做题</span>
+            <span class="kb-count" id="kbCount"></span>
+          </button>
+          <div class="kb-body" id="kbBody"></div>
+        </div>
+
+        <div class="qblock">
+          <div class="qblock-label">题目</div>
+          <div class="q-recall-hint" id="qRecallHint"></div>
+          <img class="math-img q-img" id="qImg" src="" alt="题目">
+        </div>
+
+        <!-- 三个子版块各自独立折叠，默认全部收起，先想后看 -->
+        <div class="answer-area" id="answerArea">
+          <details class="afold afold-tpl" id="tplFold">
+            <summary><span class="tr-icon">🧩</span><span class="tr-label">题型做题模板 · 权威定理 + 点题</span><span class="tr-caret">▶</span></summary>
+            <div class="afold-body"><div class="tpl-card" id="tplCard"></div></div>
+          </details>
+          <details class="think-ref" id="thinkRef">
+            <summary><span class="tr-icon">💭</span><span class="tr-label">这题我是怎么想的 · 真实做题思路</span><span class="tr-caret">▶</span></summary>
+            <div class="think-card" id="thinkCard"></div>
+          </details>
+          <details class="afold afold-ans" id="ansFold">
+            <summary><span class="tr-icon">📝</span><span class="tr-label">参考答案与手写批注（原书图片）</span><span class="tr-caret">▶</span></summary>
+            <div class="afold-body"><div class="answer-imgs" id="answerImgs"></div></div>
+          </details>
+        </div>
+      </article>
+
+      <div class="study-actions">
+        <button class="act-btn act-prev" id="prevBtn">← 上一题</button>
+        <button class="act-btn act-weak" id="weakBtn">🔖 标记模糊</button>
+        <button class="act-btn act-know" id="knowBtn">✓ 已掌握</button>
+        <button class="act-btn act-next" id="nextBtn">下一题 →</button>
+      </div>
+      <div class="study-hint">键盘：← → 切题，空格 展开/收起详解，1 模糊 2 掌握</div>
+    </section>
+  </main>
+</div>
+
+<!-- 图片放大 -->
+<div class="lightbox hidden" id="lightbox">
+  <img id="lightboxImg" src="" alt="放大查看">
+</div>
+
+<script src="vendor/katex/katex.min.js?v=20261007"></script>
+<script src="data.js?v=20261007"></script>
+<script src="data_diff.js?v=20261007"></script>
+<script src="templates.js?v=20261007"></script>
+<script src="knowledge.js?v=20261007"></script>
+<script src="analysis.js?v=20261007"></script>
+<script src="mathfmt.js?v=20261007"></script>
+<script src="app.js?v=20261007"></script>
+</body>
+</html>
