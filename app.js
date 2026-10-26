@@ -1,8 +1,24 @@
 /* ================= 数据与状态 ================= */
 let P, CATS, byId;
 const CHAPTERS = {
-  jifen: { name: '一元积分', total: 185, data: window.QB, storeKey: 'jifen_card_progress_v1' },
-  weifen: { name: '一元微分', total: 140, data: window.QB_DIFF, storeKey: 'weifen_card_progress_v1' }
+  jifen: { name: '一元积分', total: 185, data: window.QB, storeKey: 'jifen_card_progress_v1',
+           hero: '积分计算核心题库', sub: '7 大题型 · 46 个做题模板 · 每题含题干、详解与手写批注。先想后看，按模板总结套路。' },
+  weifen: { name: '一元微分', total: 140, data: window.QB_DIFF, storeKey: 'weifen_card_progress_v1',
+            hero: '一元微分核心题库', sub: '4 大板块 · 导数概念/计算/应用 · 匹配知识点 PDF 页码，先回忆再做题。' },
+  c2: { name: '积分应用', total: 57, data: window.QB_DG.c2, storeKey: 'dg_c2_v1',
+        hero: '积分应用（大观严选）', sub: '几何应用 · 物理应用 · 每题含题干与详解。', method: null },
+  c3: { name: '反常积分审敛', total: 12, data: window.QB_DG.c3, storeKey: 'dg_c3_v1',
+        hero: '反常积分审敛（大观严选）', sub: '审敛 · 敛散性与参数的关系。', method: null },
+  c4: { name: '其他积分题型', total: 21, data: window.QB_DG.c4, storeKey: 'dg_c4_v1',
+        hero: '其他积分题型（大观严选）', sub: '几何意义 · 三大定理 · 比大小 · 变限积分。', method: null },
+  d: { name: '多元微分', total: 68, data: window.QB_DG.d, storeKey: 'dg_d_v1',
+       hero: '多元微分（大观严选）', sub: '概念 · 重极限 · 偏导数 · 极值最值。', method: null },
+  e: { name: '二重积分', total: 59, data: window.QB_DG.e, storeKey: 'dg_e_v1',
+       hero: '二重积分（大观严选）', sub: '直角坐标 · 极坐标 · 分段函数 · 交换次序。', method: null },
+  f: { name: '微分方程', total: 93, data: window.QB_DG.f, storeKey: 'dg_f_v1',
+       hero: '微分方程（大观严选）', sub: '解的结构 · 求解 · 逆问题 · 解的处理 · 各种给式。', method: null },
+  g: { name: '级数', total: 142, data: window.QB_DG.g, storeKey: 'dg_g_v1',
+       hero: '级数（大观严选）', sub: '数项级数 · 幂级数收敛域/求和/展开 · 傅里叶。', method: null }
 };
 let currentChapter = 'jifen';
 window.currentChapter = currentChapter;
@@ -175,12 +191,8 @@ function masteryStats() {
 function renderHome() {
   // 章节标题
   const ch = CHAPTERS[currentChapter];
-  $('#heroTitle').innerHTML = currentChapter === 'jifen'
-    ? '积分计算核心题库 <span class="hero-badge">卡片复习</span>'
-    : '一元微分核心题库 <span class="hero-badge">卡片复习</span>';
-  $('#heroSub').textContent = currentChapter === 'jifen'
-    ? '7 大题型 · 46 个做题模板 · 每题含题干、详解与手写批注。先想后看，按模板总结套路。'
-    : '4 大板块 · 导数概念/计算/应用 · 匹配知识点 PDF 页码，先回忆再做题。';
+  $('#heroTitle').innerHTML = `${ch.hero || ch.name} <span class="hero-badge">卡片复习</span>`;
+  $('#heroSub').textContent = ch.sub || '';
   document.querySelectorAll('.ch-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.ch === currentChapter));
 
@@ -192,8 +204,10 @@ function renderHome() {
     <div class="hstat"><span class="num">${s.weak}</span><span class="lab">标记模糊</span></div>
     <div class="hstat"><span class="num">${pct}%</span><span class="lab">掌握进度</span></div>`;
 
-  const m = currentChapter === 'weifen' ? window.METHOD_INTRO_DIFF : window.METHOD_INTRO;
-  $('#methodCard').innerHTML = `
+  const m = ch.method !== undefined ? ch.method
+    : (currentChapter === 'weifen' ? window.METHOD_INTRO_DIFF : window.METHOD_INTRO);
+  $('#methodCard').style.display = m ? '' : 'none';
+  if (m) $('#methodCard').innerHTML = `
     <h3>🧭 ${m.title}</h3>
     <div class="method-flow">
       ${m.flow.map((t, i) => `<div class="flow-step"><b>第 ${['一', '二', '三'][i] || (i + 1)} 步</b><span>${MF(t)}</span></div>`).join('')}
@@ -289,84 +303,12 @@ function startQueue(ids, pos0) {
 }
 function curProblem() { return byId[state.queue[state.pos]]; }
 
-/* 知识点温习渲染（紧凑版：一行页码标签，点击展开） */
-function renderKnowledge(cat) {
-  const kps = window.getKnowledgeFor(cat);
-  const supp = window.getSupplementFor(cat);
-  const total = kps.length + (supp ? 1 : 0);
-  $('#kbCount').textContent = total;
-  const block = $('#knowledgeBlock');
-  block.classList.remove('collapsed');
-
-  const pages = kps.map(k => k.page);
-  const pageStr = pages.map(p => `P${p}`).join(' · ');
-
-  // 顶部：对应知识点 PDF 页码
-  let html = `<div class="kb-headline">📚 对应知识点 PDF：<span class="kb-headline-pages">${pageStr}</span></div>`;
-
-  // 页码标签条（点击展开对应知识点）
-  html += `<div class="kb-chips">`;
-  kps.forEach((k, i) => {
-    html += `<button class="kb-chip" data-i="${i}"><b>P${k.page}</b> ${k.title.split('：')[0].split('·')[0].trim()}</button>`;
-  });
-  if (supp) {
-    html += `<button class="kb-chip supp-chip" data-i="supp"><b>补</b> PDF未覆盖</button>`;
-  }
-  html += `</div>`;
-
-  // 知识点详情区（默认空，点击 chip 填入并展开）
-  html += `<div class="kb-detail" id="kbDetail"></div>`;
-
-  $('#kbBody').innerHTML = html;
-
-  $('#kbBody').querySelectorAll('.kb-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const i = chip.dataset.i;
-      if (chip.classList.contains('active')) {
-        chip.classList.remove('active');
-        $('#kbDetail').innerHTML = '';
-        return;
-      }
-      $('#kbBody').querySelectorAll('.kb-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      if (i === 'supp') {
-        $('#kbDetail').innerHTML = renderSuppCard(supp);
-      } else {
-        $('#kbDetail').innerHTML = renderKpCard(kps[+i], +i);
-      }
-      $('#kbDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-  });
-}
-
-function renderKpCard(k, i) {
-  return `
-    <div class="kp-card" id="kp-card-${i}">
-      <div class="kp-card-head">
-        <span class="kp-page-badge">P${k.page}</span>
-        <span class="kp-title">${k.title}</span>
-        <span class="kp-src">《一元积分计算知识点》第 ${k.page} 页</span>
-      </div>
-      <div class="kp-body">
-        <div class="kp-desc">${MF(k.desc)}</div>
-        <div class="kp-img-wrap"><img loading="lazy" class="kp-img" src="${k.img}" alt="${k.title}"></div>
-      </div>
-    </div>`;
-}
-
-function renderSuppCard(supp) {
-  return `
-    <div class="kp-card kp-supplement">
-      <div class="kp-card-head">
-        <span class="kp-page-badge supp-badge">补</span>
-        <span class="kp-title">${supp.title}</span>
-        <span class="kp-badge-supp">PDF 未覆盖 · 补充</span>
-      </div>
-      <div class="kp-body">
-        <div class="kp-desc">${MF(supp.desc)}</div>
-        ${supp.points ? `<ul class="kp-points">${supp.points.map(x => `<li>${MF(x)}</li>`).join('')}</ul>` : ''}
-      </div>
-    </div>`;
+/* 左列「完整解题过程」按行渲染：按逗号/句号断行，一步一行不合并 */
+function stepLeft(text) {
+  const s = String(text ?? '').trim();
+  if (!s) return '';
+  const lines = s.split(/(?<=[。；!?？；，])/).map(t => t.trim()).filter(t => t);
+  return lines.map(line => `<div class="wk-line">${MF(line)}</div>`).join('');
 }
 
 /* 右列解析文本：按行解析标记段（原理/心理/陷阱/自检/考点） */
@@ -393,7 +335,11 @@ function walkRight(text) {
 function renderThink(id) {
   const ref = $('#thinkRef');
   const el = $('#thinkCard');
-  const a = window.ANALYSIS && window.ANALYSIS[id];
+  // 原两章读 ANALYSIS，大观严选章节读 ANALYSIS_DG（AI 生成的真实做题思路）
+  const src = (currentChapter === 'jifen' || currentChapter === 'weifen')
+    ? window.ANALYSIS
+    : (window.ANALYSIS_DG && window.ANALYSIS_DG[currentChapter]);
+  const a = src && src[id];
   ref.removeAttribute('open');
   if (!a) { ref.classList.add('hidden'); el.innerHTML = ''; return; }
   ref.classList.remove('hidden');
@@ -422,7 +368,7 @@ function renderThink(id) {
         <div class="wk-col-head wk-left-head">完整解题过程（不跳步）</div>
         <div class="wk-col-head wk-right-head">知识点匹配与步骤解析</div>
         ${w.steps.map((s, i) => `
-          <div class="wk-cell wk-left"><span class="step-no">${i + 1}</span><div class="step-l">${MF(s.l)}</div></div>
+          <div class="wk-cell wk-left"><span class="step-no">${i + 1}</span><div class="step-l">${stepLeft(s.l)}</div></div>
           <div class="wk-cell wk-right">${walkRight(s.r)}</div>`).join('')}
       </div>
       <div class="wk-summary">
@@ -494,15 +440,6 @@ function renderCard() {
 
   $('#qTitle').textContent = (p.prefix ? p.prefix + ' ' : '') + p.title;
   $('#qImg').src = p.q;
-
-  // 知识点温习
-  renderKnowledge(cat);
-
-  // 题干上方回忆提示：强化对应知识点 PDF 页码
-  const kpPages = window.getKnowledgeFor(cat).map(k => k.page);
-  const hintPages = kpPages.map(p => `P${p}`).join(' · ');
-  $('#qRecallHint').innerHTML =
-    `💡 回忆完知识点 PDF <b>${hintPages}</b> 的内容，再做下面这道题`;
 
   // 考生真实思路（独立折叠面板）
   renderThink(p.id);
@@ -623,9 +560,6 @@ $('#crumb').addEventListener('click', () => {
 $('#crumb').style.cursor = 'pointer';
 $('#crumb').title = '返回题目列表';
 $('#menuToggle').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
-$('#kbToggle').addEventListener('click', () => {
-  $('#knowledgeBlock').classList.toggle('collapsed');
-});
 $('#prevBtn').addEventListener('click', () => move(-1));
 $('#nextBtn').addEventListener('click', () => move(1));
 $('#weakBtn').addEventListener('click', () => mark(1));
