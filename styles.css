@@ -302,6 +302,7 @@ img { display: block; }
   background: #fff;
 }
 .q-img { margin: 0 auto; max-height: 260px; }
+.q-img.qa { max-height: none; }
 .q-text {
   padding: 16px 18px; background: #fff; border: 1px solid #eef0f6; border-radius: 10px;
   font-size: 15.5px; line-height: 2; color: var(--ink); white-space: pre-wrap;

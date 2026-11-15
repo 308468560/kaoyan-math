@@ -444,18 +444,18 @@ function renderCard() {
 
   $('#qTitle').textContent = (p.prefix ? p.prefix + ' ' : '') + p.title;
 
-  // 题干：优先图片；线代章节为文字题干（qtext）
+  // 题干：优先原书切图；无图时才用文字题干（qtext）兜底
   const qTextEl = $('#qText');
   const qImgEl = $('#qImg');
-  const qtext = p.qtext || (window.ANALYSIS_LA && window.ANALYSIS_LA[p.id] && window.ANALYSIS_LA[p.id].qtext);
-  if (qtext) {
-    qImgEl.classList.add('hidden');
-    qTextEl.classList.remove('hidden');
-    qTextEl.innerHTML = MF(qtext);
-  } else {
+  if (p.q) {
     qTextEl.classList.add('hidden');
     qImgEl.classList.remove('hidden');
+    qImgEl.classList.toggle('qa', String(p.q).indexOf('assets/la/') === 0);
     qImgEl.src = p.q;
+  } else {
+    qImgEl.classList.add('hidden');
+    qTextEl.classList.remove('hidden');
+    qTextEl.innerHTML = MF(p.qtext || '');
   }
 
   // 考生真实思路（独立折叠面板）
