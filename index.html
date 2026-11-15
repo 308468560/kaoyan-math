@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>积分计算 · 核心题库卡片复习</title>
 <link rel="stylesheet" href="vendor/katex/katex.min.css?v=20261007">
-<link rel="stylesheet" href="styles.css?v=20261007">
+<link rel="stylesheet" href="styles.css?v=20261115">
 </head>
 <body>
 <div class="app">
@@ -54,6 +54,7 @@
         <button class="ch-btn" data-ch="e">🟦 二重积分</button>
         <button class="ch-btn" data-ch="f">🌊 微分方程</button>
         <button class="ch-btn" data-ch="g">Σ 级数</button>
+        <button class="ch-btn" data-ch="la">Ⓛ 线代</button>
       </div>
       <div class="hero">
         <h1 id="heroTitle">积分计算核心题库 <span class="hero-badge">卡片复习</span></h1>
@@ -96,6 +97,7 @@
           <div class="qblock-label">题目</div>
           <div class="q-recall-hint" id="qRecallHint"></div>
           <img class="math-img q-img" id="qImg" src="" alt="题目">
+          <div class="q-text hidden" id="qText"></div>
         </div>
 
         <!-- 三个子版块各自独立折叠，默认全部收起，先想后看 -->
@@ -139,7 +141,9 @@
 <script src="knowledge.js?v=20261007"></script>
 <script src="analysis.js?v=20261007"></script>
 <script src="analysis_dg.js?v=20261014"></script>
+<script src="data_la.js?v=20261115"></script>
+<script src="analysis_la.js?v=20261115"></script>
 <script src="mathfmt.js?v=20261007"></script>
-<script src="app.js?v=20261012"></script>
+<script src="app.js?v=20261115"></script>
 </body>
 </html>

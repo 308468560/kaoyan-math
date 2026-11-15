@@ -18,7 +18,9 @@ const CHAPTERS = {
   f: { name: '微分方程', total: 93, data: window.QB_DG.f, storeKey: 'dg_f_v1',
        hero: '微分方程（大观严选）', sub: '解的结构 · 求解 · 逆问题 · 解的处理 · 各种给式。', method: null },
   g: { name: '级数', total: 142, data: window.QB_DG.g, storeKey: 'dg_g_v1',
-       hero: '级数（大观严选）', sub: '数项级数 · 幂级数收敛域/求和/展开 · 傅里叶。', method: null }
+       hero: '级数（大观严选）', sub: '数项级数 · 幂级数收敛域/求和/展开 · 傅里叶。', method: null },
+  la: { name: '线代', total: 337, data: window.QB_LA.la, storeKey: 'la_v1',
+        hero: '线代臻选题（答案书）', sub: '行列式 · 矩阵 · 向量 · 方程组 · 特征值 · 二次型 · 数一专项。', method: null }
 };
 let currentChapter = 'jifen';
 window.currentChapter = currentChapter;
@@ -335,10 +337,12 @@ function walkRight(text) {
 function renderThink(id) {
   const ref = $('#thinkRef');
   const el = $('#thinkCard');
-  // 原两章读 ANALYSIS，大观严选章节读 ANALYSIS_DG（AI 生成的真实做题思路）
+  // 原两章读 ANALYSIS，大观严选章节读 ANALYSIS_DG，线代读 ANALYSIS_LA
   const src = (currentChapter === 'jifen' || currentChapter === 'weifen')
     ? window.ANALYSIS
-    : (window.ANALYSIS_DG && window.ANALYSIS_DG[currentChapter]);
+    : (currentChapter === 'la'
+      ? (window.ANALYSIS_LA && window.ANALYSIS_LA)
+      : (window.ANALYSIS_DG && window.ANALYSIS_DG[currentChapter]));
   const a = src && src[id];
   ref.removeAttribute('open');
   if (!a) { ref.classList.add('hidden'); el.innerHTML = ''; return; }
@@ -439,7 +443,20 @@ function renderCard() {
   $('#knowBtn').classList.toggle('on', st === 2);
 
   $('#qTitle').textContent = (p.prefix ? p.prefix + ' ' : '') + p.title;
-  $('#qImg').src = p.q;
+
+  // 题干：优先图片；线代章节为文字题干（qtext）
+  const qTextEl = $('#qText');
+  const qImgEl = $('#qImg');
+  const qtext = p.qtext || (window.ANALYSIS_LA && window.ANALYSIS_LA[p.id] && window.ANALYSIS_LA[p.id].qtext);
+  if (qtext) {
+    qImgEl.classList.add('hidden');
+    qTextEl.classList.remove('hidden');
+    qTextEl.innerHTML = MF(qtext);
+  } else {
+    qTextEl.classList.add('hidden');
+    qImgEl.classList.remove('hidden');
+    qImgEl.src = p.q;
+  }
 
   // 考生真实思路（独立折叠面板）
   renderThink(p.id);

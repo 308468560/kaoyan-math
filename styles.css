@@ -302,6 +302,10 @@ img { display: block; }
   background: #fff;
 }
 .q-img { margin: 0 auto; max-height: 260px; }
+.q-text {
+  padding: 16px 18px; background: #fff; border: 1px solid #eef0f6; border-radius: 10px;
+  font-size: 15.5px; line-height: 2; color: var(--ink); white-space: pre-wrap;
+}
 .answer-imgs { display: flex; flex-direction: column; gap: 14px; }
 .answer-imgs .math-img { box-shadow: 0 1px 6px rgba(0,0,0,.07); border: 1px solid #f0f1f6; }
 
