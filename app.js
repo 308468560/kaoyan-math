@@ -285,7 +285,7 @@ function renderGrid() {
       </button>`;
   }).join('');
   grid.querySelectorAll('.p-tile').forEach(t => {
-    t.addEventListener('click', () => startStudy(+t.dataset.id));
+    t.addEventListener('click', () => startStudy(t.dataset.id));
   });
 }
 
@@ -294,7 +294,7 @@ function startStudy(id) {
   let list = filteredProblems();
   if (!state.keyword && state.shuffled) list = shuffle(list);
   state.queue = list.map(p => p.id);
-  const idx = state.queue.indexOf(id);
+  const idx = state.queue.findIndex(q => String(q) === String(id));
   state.pos = idx < 0 ? 0 : idx;
   showView('study');
 }
